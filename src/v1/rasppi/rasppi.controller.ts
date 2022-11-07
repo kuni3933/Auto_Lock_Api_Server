@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RasppiService } from './rasppi.service';
 import { CreateRasppiDto } from './dto/create-rasppi.dto';
 import { UpdateRasppiDto } from './dto/update-rasppi.dto';
 
-@Controller('rasppi')
+@Controller('v1/rasppi')
 export class RasppiController {
   constructor(private readonly rasppiService: RasppiService) {}
 

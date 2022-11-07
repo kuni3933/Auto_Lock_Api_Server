@@ -7,6 +7,6 @@ import { AccountModule } from './account/account.module';
 @Module({
   controllers: [V1Controller],
   providers: [V1Service],
-  imports: [RasppiModule, AccountModule]
+  imports: [RasppiModule, AccountModule],
 })
 export class V1Module {}
