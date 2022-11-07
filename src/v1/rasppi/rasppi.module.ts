@@ -3,7 +3,7 @@ import { RasppiService } from './rasppi.service';
 import { RasppiController } from './rasppi.controller';
 
 @Module({
-  providers: [RasppiService],
-  controllers: [RasppiController]
+  controllers: [RasppiController],
+  providers: [RasppiService]
 })
 export class RasppiModule {}

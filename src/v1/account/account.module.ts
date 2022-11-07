@@ -3,7 +3,7 @@ import { AccountService } from './account.service';
 import { AccountController } from './account.controller';
 
 @Module({
-  providers: [AccountService],
   controllers: [AccountController],
+  providers: [AccountService]
 })
 export class AccountModule {}
