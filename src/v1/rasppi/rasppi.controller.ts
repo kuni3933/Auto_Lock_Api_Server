@@ -1,42 +1,21 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Body, Headers, Post, Delete } from '@nestjs/common';
 import { RasppiService } from './rasppi.service';
-import { CreateRasppiDto } from './dto/create-rasppi.dto';
-import { UpdateRasppiDto } from './dto/update-rasppi.dto';
+import { AccountDto } from './dto/account.dto';
+import { RasppiDto } from './dto/rasppi.dto';
 
 @Controller('v1/rasppi')
 export class RasppiController {
   constructor(private readonly rasppiService: RasppiService) {}
 
+  // ラズパイ登録
   @Post()
-  create(@Body() createRasppiDto: CreateRasppiDto) {
-    return this.rasppiService.create(createRasppiDto);
+  create(@Headers() AccountDto: AccountDto, @Body() RasppiDto: RasppiDto) {
+    return this.rasppiService.create(AccountDto, RasppiDto);
   }
 
-  @Get()
-  findAll() {
-    return this.rasppiService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rasppiService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRasppiDto: UpdateRasppiDto) {
-    return this.rasppiService.update(+id, updateRasppiDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rasppiService.remove(+id);
+  // ラズパイ解除
+  @Delete()
+  remove(@Headers() AccountDto: AccountDto, @Body() RasppiDto: RasppiDto) {
+    return this.rasppiService.remove(AccountDto, RasppiDto);
   }
 }
