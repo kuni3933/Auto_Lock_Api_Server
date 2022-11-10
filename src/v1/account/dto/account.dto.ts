@@ -1,3 +1,6 @@
+import { IsNotEmpty, IsString } from 'class-validator';
 export class AccountDto {
-  idToken: string;
+  @IsNotEmpty()
+  @IsString()
+  Token: string;
 }
