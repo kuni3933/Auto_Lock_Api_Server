@@ -17,4 +17,29 @@ const app: App = initializeApp({
 const auth: Auth = getAuth(app);
 const db: Database = getDatabase(app);
 const fs: Firestore = getFirestore(app);
-export { app, auth, db, fs };
+
+// 受け取ったidTokenのチェック
+async function verifyIdToken(idToken: string): Promise<object> {
+  // return用Object uidObjのtype
+  type uidObjType = {
+    isUser: boolean;
+    uid?: string;
+  };
+  const uidObj: uidObjType = { isUser: undefined };
+
+  await auth
+    .verifyIdToken(idToken)
+    .then((decodedToken) => {
+      uidObj.isUser = true;
+      uidObj.uid = decodedToken.uid;
+    })
+    .catch((err) => {
+      uidObj.isUser = false;
+      console.log('Error:');
+      console.log(err);
+      console.log('\n');
+    });
+  return uidObj;
+}
+
+export { app, auth, db, fs, verifyIdToken };
