@@ -1,4 +1,5 @@
-import { Controller, Body, Post, Delete } from '@nestjs/common';
+import { Controller, Body, Post, Delete, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AccountService } from './account.service';
 import { AccountDto } from './dto/account.dto';
 
@@ -8,13 +9,17 @@ export class AccountController {
 
   // 認証済みUserのDBを初期作成
   @Post()
-  create(@Body() AccountDto: AccountDto) {
-    return this.accountService.create(AccountDto);
+  create(@Body() AccountDto: AccountDto, @Res() res: Response) {
+    this.accountService.create(AccountDto).then((resHttpStatus) => {
+      res.status(resHttpStatus).send();
+    });
   }
 
   // 認証済みUserのDBを削除
   @Delete()
-  remove(@Body() AccountDto: AccountDto) {
-    return this.accountService.remove(AccountDto);
+  remove(@Body() AccountDto: AccountDto, @Res() res: Response) {
+    this.accountService.remove(AccountDto).then((resHttpStatus) => {
+      res.status(resHttpStatus).send();
+    });
   }
 }
