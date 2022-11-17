@@ -7,7 +7,7 @@ import { AccountDto } from './dto/account.dto';
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
-  // 認証済みUserのDBを初期作成
+  // 認証済みUserのFirestoreDbを初期作成
   @Post()
   create(@Body() AccountDto: AccountDto, @Res() res: Response) {
     this.accountService.create(AccountDto).then((resHttpStatus) => {
@@ -15,7 +15,7 @@ export class AccountController {
     });
   }
 
-  // 認証済みUserのDBを削除
+  // 認証済みUserのFirestoreDbを削除
   @Delete()
   remove(@Body() AccountDto: AccountDto, @Res() res: Response) {
     this.accountService.remove(AccountDto).then((resHttpStatus) => {
