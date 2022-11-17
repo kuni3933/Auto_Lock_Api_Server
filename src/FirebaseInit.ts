@@ -1,10 +1,5 @@
 import * as dotenv from 'dotenv';
-import {
-  App,
-  applicationDefault,
-  initializeApp,
-  cert,
-} from 'firebase-admin/app';
+import { App, initializeApp, cert } from 'firebase-admin/app';
 import { Auth, getAuth } from 'firebase-admin/auth';
 import { Database, getDatabase } from 'firebase-admin/database';
 import { Firestore, getFirestore } from 'firebase-admin/firestore';
@@ -40,7 +35,7 @@ async function verifyIdToken(idToken: string): Promise<string> {
       console.log(err);
     })
     .finally(() => {
-      console.log('uid: ' + uid);
+      console.log(`uid: ${uid}`);
     });
   return uid;
 }
