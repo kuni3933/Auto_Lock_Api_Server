@@ -39,7 +39,7 @@ export class AccountService {
           resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         })
         .finally(() => {
-          console.log('isFirestoreDbExists: ' + isFirestoreDbExists);
+          console.log(`isFirestoreDbExists: ${isFirestoreDbExists}`);
         });
       //*/
 
@@ -69,7 +69,7 @@ export class AccountService {
       resHttpStatus = HttpStatus.UNAUTHORIZED;
     }
 
-    console.log('\n');
+    console.log(`resHttpStatus: ${resHttpStatus}\n`);
     return resHttpStatus;
   }
 
@@ -108,7 +108,7 @@ export class AccountService {
           resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         })
         .finally(() => {
-          console.log('isFirestoreDbExists: ' + isFirestoreDbExists);
+          console.log(`isFirestoreDbExists: ${isFirestoreDbExists}`);
         });
       //*/
 
@@ -137,7 +137,7 @@ export class AccountService {
       resHttpStatus = HttpStatus.UNAUTHORIZED;
     }
 
-    console.log('\n');
+    console.log(`resHttpStatus: ${resHttpStatus}\n`);
     return resHttpStatus;
   }
 }
