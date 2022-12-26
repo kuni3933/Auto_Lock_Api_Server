@@ -1,4 +1,11 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class RasppiDto {
-  SerialNumber: string;
+  @IsNotEmpty()
+  @IsString()
+  Token: string;
+
+  @IsNotEmpty()
+  @IsString()
   x509: string;
 }

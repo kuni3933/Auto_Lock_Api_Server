@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { AccountDto } from './dto/account.dto';
-import { fs, verifyIdToken } from '../../FirebaseInit';
+import { auth, refFirestoreDbUser } from '../../FirebaseInit';
 
 @Injectable()
 export class AccountService {
@@ -13,60 +13,45 @@ export class AccountService {
   // Tokenエラー => resHttpStatus 401
   async create(AccountDto: AccountDto) {
     // return用Httpステータスコード
-    let resHttpStatus: number;
+    let resHttpStatus: number = undefined;
     // uidチェックの結果
-    const uid: string = await verifyIdToken(AccountDto.Token).then((uid) => {
-      return uid;
-    });
-
-    //* uidが登録された正規のuidだった場合
+    const uid: string = await auth
+      .verifyIdToken(AccountDto.Token)
+      .then((decodedToken) => {
+        return decodedToken.uid;
+      })
+      .catch((error) => {
+        console.log('---------- Error ----------\nverifyIdToken:');
+        console.log(error);
+        return undefined;
+      });
+    // FirestoreDatabaseにUsers/uidがあるか存在確認
     if (uid != undefined) {
-      resHttpStatus = HttpStatus.CREATED;
-      let isFirestoreDbExists: boolean = undefined;
-      const refFirestoreDb = fs.collection('User');
-
-      //* FirestoreDatabaseにUsers/uidがあるか存在確認
-      // 結果true/falseをisFirestoreDbExistsに格納
-      await refFirestoreDb
+      await refFirestoreDbUser
         .doc(uid)
         .get()
-        .then((doc) => {
-          if (doc.exists) isFirestoreDbExists = true;
+        .then(() => {
+          // 読み取れた場合は作成済みなのでステータスコード200を代入
+          resHttpStatus = HttpStatus.OK;
         })
         .catch((error) => {
-          console.log('Error: refFirestoreDb.doc(uid).get()');
+          console.log('Error: refFirestoreDbUser.doc(uid).get()');
           console.error(error);
-          resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-        })
-        .finally(() => {
-          console.log(`isFirestoreDbExists: ${isFirestoreDbExists}`);
+          resHttpStatus = HttpStatus.CREATED; // エラーの場合は未作成なのでステータスコード201を代入
         });
-      //*/
+    }
 
-      //* FirestoreDbにユーザーデータが無かった場合
-      if (
-        isFirestoreDbExists != true &&
-        resHttpStatus != HttpStatus.INTERNAL_SERVER_ERROR
-      ) {
-        const pushData = { RaspPiSerialNumber: [], UserName: null };
-        await refFirestoreDb
-          .doc(uid)
-          .set(pushData)
-          .catch((err) => {
-            console.log('Error: refFirestoreDb.doc(uid).set(pushData)');
-            console.log(err);
-            resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-          });
-      }
-      //* 作成済みだった場合
-      else if (
-        isFirestoreDbExists == true &&
-        resHttpStatus != HttpStatus.INTERNAL_SERVER_ERROR
-      ) {
-        resHttpStatus = HttpStatus.OK;
-      }
-    } else {
-      resHttpStatus = HttpStatus.UNAUTHORIZED;
+    //* uidが登録された正規のuid && FirestoreDbにユーザーデータが無かった場合
+    if (uid != undefined && resHttpStatus == 201) {
+      const pushData = { RaspPiSerialNumber: [], UserName: null, imageURL: '' };
+      await refFirestoreDbUser
+        .doc(uid)
+        .set(pushData)
+        .catch((err) => {
+          console.log('Error: refFirestoreDbUser.doc(uid).set(pushData)');
+          console.log(err);
+          resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        });
     }
 
     console.log(`resHttpStatus: ${resHttpStatus}\n`);
@@ -84,26 +69,32 @@ export class AccountService {
     // return用Httpステータスコード
     let resHttpStatus: number;
     // uidチェックの結果
-    const uid: string = await verifyIdToken(AccountDto.Token).then((uid) => {
-      return uid;
-    });
+    const uid: string = await auth
+      .verifyIdToken(AccountDto.Token)
+      .then((decodedToken) => {
+        return decodedToken.uid;
+      })
+      .catch((error) => {
+        console.log('---------- Error ----------\nverifyIdToken:');
+        console.log(error);
+        return undefined;
+      });
 
     //* uidが登録された正規のuidだった場合
     if (uid != undefined) {
       resHttpStatus = HttpStatus.NO_CONTENT;
       let isFirestoreDbExists: boolean = undefined;
-      const refFirestoreDb = fs.collection('User');
 
       //* FirestoreDatabaseにUsers/uidがあるか存在確認
       // 結果true/falseをisFirestoreDbExistsに格納
-      await refFirestoreDb
+      await refFirestoreDbUser
         .doc(uid)
         .get()
         .then((doc) => {
           if (doc.exists) isFirestoreDbExists = true;
         })
         .catch((error) => {
-          console.log('Error: refFirestoreDb.doc(uid).get()');
+          console.log('Error: refFirestoreDbUser.doc(uid).get()');
           console.error(error);
           resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         })
@@ -117,11 +108,11 @@ export class AccountService {
         isFirestoreDbExists == true &&
         resHttpStatus != HttpStatus.INTERNAL_SERVER_ERROR
       ) {
-        await refFirestoreDb
+        await refFirestoreDbUser
           .doc(uid)
           .delete()
           .catch((err) => {
-            console.log('Error: refFirestoreDb.doc(uid).delete()');
+            console.log('Error: refFirestoreDbUser.doc(uid).delete()');
             console.log(err);
             resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
           });

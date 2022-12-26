@@ -1,6 +1,6 @@
-import { Controller, Body, Headers, Post, Delete } from '@nestjs/common';
+import { Controller, Body, Post, Delete, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { RasppiService } from './rasppi.service';
-import { AccountDto } from './dto/account.dto';
 import { RasppiDto } from './dto/rasppi.dto';
 
 @Controller('v1/rasppi')
@@ -9,13 +9,17 @@ export class RasppiController {
 
   // ラズパイ登録
   @Post()
-  create(@Headers() AccountDto: AccountDto, @Body() RasppiDto: RasppiDto) {
-    return this.rasppiService.create(AccountDto, RasppiDto);
+  create(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
+    this.rasppiService.create(RasppiDto).then((resHttpStatus) => {
+      res.status(resHttpStatus).send();
+    });
   }
 
   // ラズパイ解除
   @Delete()
-  remove(@Headers() AccountDto: AccountDto, @Body() RasppiDto: RasppiDto) {
-    return this.rasppiService.remove(AccountDto, RasppiDto);
+  remove(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
+    this.rasppiService.remove(RasppiDto).then((resHttpStatus) => {
+      res.status(resHttpStatus).send();
+    });
   }
 }
