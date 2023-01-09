@@ -4,6 +4,6 @@ import { RasppiController } from './rasppi.controller';
 
 @Module({
   controllers: [RasppiController],
-  providers: [RasppiService]
+  providers: [RasppiService],
 })
 export class RasppiModule {}
