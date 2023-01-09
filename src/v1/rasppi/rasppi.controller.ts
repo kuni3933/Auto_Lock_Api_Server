@@ -10,16 +10,18 @@ export class RasppiController {
   // ラズパイ登録
   @Post()
   create(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
-    this.rasppiService.create(RasppiDto).then((resHttpStatus) => {
-      res.status(resHttpStatus).send();
+    console.log('----- ~/v1/rasppi:[POST] -----');
+    this.rasppiService.create(RasppiDto).then((resArray) => {
+      res.status(resArray.httpStatus).json(resArray.json).send();
     });
   }
 
   // ラズパイ解除
   @Delete()
   remove(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
-    this.rasppiService.remove(RasppiDto).then((resHttpStatus) => {
-      res.status(resHttpStatus).send();
+    console.log('----- ~/v1/rasppi:[DELETE] -----');
+    this.rasppiService.remove(RasppiDto).then((resArray) => {
+      res.status(resArray.httpStatus).send();
     });
   }
 }

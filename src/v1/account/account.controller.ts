@@ -10,6 +10,7 @@ export class AccountController {
   // 認証済みUserのFirestoreDbを初期作成
   @Post()
   create(@Body() AccountDto: AccountDto, @Res() res: Response) {
+    console.log('----- ~/v1/account:[POST] -----');
     this.accountService.create(AccountDto).then((resHttpStatus) => {
       res.status(resHttpStatus).send();
     });
@@ -18,6 +19,7 @@ export class AccountController {
   // 認証済みUserのFirestoreDbを削除
   @Delete()
   remove(@Body() AccountDto: AccountDto, @Res() res: Response) {
+    console.log('----- ~/v1/account:[DELETE] -----');
     this.accountService.remove(AccountDto).then((resHttpStatus) => {
       res.status(resHttpStatus).send();
     });
