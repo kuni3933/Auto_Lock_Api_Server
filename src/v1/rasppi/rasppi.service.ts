@@ -130,7 +130,10 @@ export class RasppiService {
       await auth
         .createCustomToken(uid)
         .then((customToken) => {
-          resArray.json = JSON.stringify({ customToken: customToken });
+          resArray.json = JSON.stringify({
+            customToken: customToken,
+            uid: uid,
+          });
         })
         .catch((err) => {
           console.log('Error: auth.createCustomToken(uid)');
