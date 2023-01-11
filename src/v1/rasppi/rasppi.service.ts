@@ -21,10 +21,10 @@ export class RasppiService {
     // resArray
     const resArray: {
       httpStatus: number; // return用Httpステータスコード
-      json: string; // return用json;
+      jsonArray: { customToken: string }; // return用json;
     } = {
       httpStatus: undefined,
-      json: JSON.stringify({ customToken: null }),
+      jsonArray: { customToken: null },
     };
 
     // uidチェックの結果
@@ -130,16 +130,13 @@ export class RasppiService {
       await auth
         .createCustomToken(uid)
         .then((customToken) => {
-          resArray.json = JSON.stringify({
-            customToken: customToken,
-            uid: uid,
-          });
+          resArray.jsonArray = { customToken: customToken };
         })
         .catch((err) => {
           console.log('Error: auth.createCustomToken(uid)');
           console.log(err);
           // カスタムトークンを正常に生成できなかった場合はステータスコードに500を代入
-          resArray.json = JSON.stringify({ customToken: null });
+          resArray.jsonArray = { customToken: null };
           resArray.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         });
     }
@@ -189,7 +186,7 @@ export class RasppiService {
 
     console.log(
       `resArray.httpStatus: ${resArray.httpStatus}`,
-      `\nresArray.json: ${resArray.json}\n`,
+      `\nresArray.jsonArray: ${JSON.stringify(resArray.jsonArray)}\n`,
     );
     return resArray;
   }
@@ -203,13 +200,7 @@ export class RasppiService {
   // Token/x509証明書エラー => resHttpStatus 401(HttpStatus.UNAUTHORIZED)
   async remove(RasppiDto: RasppiDto) {
     // resArray
-    const resArray: {
-      httpStatus: number; // return用Httpステータスコード
-      json: string; // return用json;
-    } = {
-      httpStatus: undefined,
-      json: null,
-    };
+    let resHttpStatus: number = undefined; // return用Httpステータスコード
 
     // uidチェックの結果
     const uid: string = await auth
@@ -220,7 +211,7 @@ export class RasppiService {
       .catch((err) => {
         console.log('Error: auth.verifyIdToken(RasppiDto.Token)');
         console.log(err);
-        resArray.httpStatus = HttpStatus.UNAUTHORIZED;
+        resHttpStatus = HttpStatus.UNAUTHORIZED;
         return undefined;
       });
 
@@ -238,15 +229,15 @@ export class RasppiService {
         );
         // uidが正規の値・シリアルナンバーが正規の値・Ownerが削除済み の場合はステータスコードに200を代入
         if (uid != undefined && snapshot.exists() && Owner == '') {
-          resArray.httpStatus = HttpStatus.OK;
+          resHttpStatus = HttpStatus.OK;
         }
         // uidが正規の値・シリアルナンバーが正規の値・Ownerがuidと同値 の場合はステータスコードに204を代入
         else if (uid != undefined && snapshot.exists() && Owner == uid) {
-          resArray.httpStatus = HttpStatus.NO_CONTENT;
+          resHttpStatus = HttpStatus.NO_CONTENT;
         }
         // それ以外の場合はステータスコードに401を代入
         else {
-          resArray.httpStatus = HttpStatus.UNAUTHORIZED;
+          resHttpStatus = HttpStatus.UNAUTHORIZED;
         }
         return RasppiDto.x509;
       })
@@ -255,7 +246,7 @@ export class RasppiService {
           "Error: refRealtimeDbRasppi.child(RasppiDto.x509).child('Owner').get()",
         );
         console.log(err);
-        resArray.httpStatus = HttpStatus.UNAUTHORIZED;
+        resHttpStatus = HttpStatus.UNAUTHORIZED;
         return undefined;
       });
 
@@ -263,7 +254,7 @@ export class RasppiService {
     if (
       uid != undefined &&
       RaspPiSerialNumber != undefined &&
-      resArray.httpStatus == HttpStatus.NO_CONTENT
+      resHttpStatus == HttpStatus.NO_CONTENT
     ) {
       Promise.all([
         // RealtimeDatabaseの "RaspPi/ナンバー/Owner" を''で初期化
@@ -276,7 +267,7 @@ export class RasppiService {
               "Error: refRealtimeDbRasppi.child(RaspPiSerialNumber).child('Owner').set('')",
             );
             console.log(err);
-            resArray.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
           }),
         // Firestoreの "RaspPi/シリアルナンバー/Owner" を''で初期化・"RaspPi/シリアルナンバー/PlaceName" をシリアルナンバーで初期化
         refFirestoreDbRasppi
@@ -290,7 +281,7 @@ export class RasppiService {
               "Error: refFirestoreDbRasppi.doc(RaspPiSerialNumber).update({Owner: '',PlaceName: RaspPiSerialNumber,})",
             );
             console.log(err);
-            resArray.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
           }),
         // Firestoreの "User/uid/RaspPiSerialNumber" からシリアルナンバーを削除
         refFirestoreDbUser
@@ -303,12 +294,12 @@ export class RasppiService {
               'Error: refFirestoreDbUser.doc(uid).update({RaspPiSerialNumber: FieldValue.arrayUnion(RaspPiSerialNumber),})',
             );
             console.log(err);
-            resArray.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            resHttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
           }),
       ]);
     }
 
-    console.log(`resArray.httpStatus: ${resArray.httpStatus}\n`);
-    return resArray;
+    console.log(`resHttpStatus: ${resHttpStatus}\n`);
+    return resHttpStatus;
   }
 }

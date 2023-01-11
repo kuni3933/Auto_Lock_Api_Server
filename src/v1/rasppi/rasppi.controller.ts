@@ -12,7 +12,7 @@ export class RasppiController {
   create(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
     console.log('----- ~/v1/rasppi:[POST] -----');
     this.rasppiService.create(RasppiDto).then((resArray) => {
-      res.status(resArray.httpStatus).json(resArray.json).send();
+      res.status(resArray.httpStatus).json(resArray.jsonArray).send();
     });
   }
 
@@ -20,8 +20,8 @@ export class RasppiController {
   @Delete()
   remove(@Body() RasppiDto: RasppiDto, @Res() res: Response) {
     console.log('----- ~/v1/rasppi:[DELETE] -----');
-    this.rasppiService.remove(RasppiDto).then((resArray) => {
-      res.status(resArray.httpStatus).send();
+    this.rasppiService.remove(RasppiDto).then((resHttpStatus) => {
+      res.status(resHttpStatus).send();
     });
   }
 }
