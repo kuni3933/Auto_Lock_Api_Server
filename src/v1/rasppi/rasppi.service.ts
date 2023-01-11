@@ -21,10 +21,10 @@ export class RasppiService {
     // resArray
     const resArray: {
       httpStatus: number; // return用Httpステータスコード
-      jsonArray: { customToken: string }; // return用json;
+      jsonArray: { customToken: string; ownerUid: string }; // return用json;
     } = {
       httpStatus: undefined,
-      jsonArray: { customToken: null },
+      jsonArray: { customToken: null, ownerUid: null },
     };
 
     // uidチェックの結果
@@ -130,13 +130,13 @@ export class RasppiService {
       await auth
         .createCustomToken(uid)
         .then((customToken) => {
-          resArray.jsonArray = { customToken: customToken };
+          resArray.jsonArray = { customToken: customToken, ownerUid: uid };
         })
         .catch((err) => {
           console.log('Error: auth.createCustomToken(uid)');
           console.log(err);
           // カスタムトークンを正常に生成できなかった場合はステータスコードに500を代入
-          resArray.jsonArray = { customToken: null };
+          resArray.jsonArray = { customToken: null, ownerUid: null };
           resArray.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         });
     }
